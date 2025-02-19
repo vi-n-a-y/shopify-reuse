@@ -1,0 +1,242 @@
+<!-- testimonial-slider.liquid -->
+<div class="testimonial-slider">
+  {% if section.blocks.size > 0 %}
+    <div class="slider-container">
+      {% for block in section.blocks %}
+        <div class="testimonial-card">
+          {% if block.settings.testimonial_image %}
+            <div class="testimonial-image">
+              <img src="{{ block.settings.testimonial_image | img_url: '200x200' }}" alt="{{ block.settings.testimonial_author }}">
+            </div>
+          {% endif %}
+          <p class="testimonial-content">{{ block.settings.testimonial_content }}</p>
+          <p class="testimonial-author">-- {{ block.settings.testimonial_author }}</p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Navigation Arrows -->
+    <div class="slider-navigation">
+      <button class="prev-arrow">←</button>
+      <button class="next-arrow">→</button>
+    </div>
+  {% else %}
+    <p>No testimonials added yet.</p>
+  {% endif %}
+</div>
+
+<style>
+/* Basic Styling */
+.testimonial-slider {
+  width: 85%;
+  position: relative;
+  overflow: hidden;
+  padding: 20px 0;
+  margin: 0 auto;
+}
+
+.slider-container {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  will-change: transform;
+  gap: 20px;
+}
+
+.testimonial-card {
+  min-width: calc(33.33% - 20px); /* Display 3 cards per slide */
+  text-align: center;
+  padding: 20px;
+  background: #D9D9D936;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover Effect for Testimonials */
+.testimonial-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.testimonial-image img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%; /* Makes the image round */
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.testimonial-content {
+  font-style: italic;
+  color: #555;
+  font-size: 1.2em;
+  padding: 10px;
+}
+
+.testimonial-author {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 1em;
+}
+
+/* Styling for Arrows */
+.slider-navigation {
+  margin-top:20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+.prev-arrow,
+.next-arrow {
+  background-color: transparent;
+  border: 2px solid #333;
+  border-radius: 50%;
+  font-size: 2rem;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.3s ease, border-color 0.3s ease;
+  padding: 10px;
+  margin: 0 15px;
+}
+
+
+
+/* Responsive Design for Smaller Screens */
+@media(min-width:540px) and (max-width: 768px) {
+  .testimonial-card {
+    min-width: calc(50% - 20px); /* 2 cards per slide on tablets */
+  }
+
+  .prev-arrow,
+  .next-arrow {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .testimonial-card {
+    min-width: 100%; /* Ensure each card takes the full width on mobile */
+  }
+
+  .prev-arrow,
+  .next-arrow {
+    font-size: 1.2rem;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const sliderContainer = document.querySelector('.slider-container');
+  const testimonialCards = document.querySelectorAll('.testimonial-card');
+  const prevArrow = document.querySelector('.prev-arrow');
+  const nextArrow = document.querySelector('.next-arrow');
+  
+  // Set visibleCards to 1 for now as we want to scroll by one card per time
+  const visibleCards = 1;
+  let currentIndex = 0;
+
+  // Get the width of one card
+  const cardWidth = testimonialCards[0].offsetWidth;
+  
+  // Update Slider Position
+  function updateSlider() {
+    const offset = -currentIndex * cardWidth;
+    sliderContainer.style.transform = `translateX(${offset}px)`;
+  }
+
+  // Next Slide
+  nextArrow.addEventListener('click', () => {
+    if (currentIndex < testimonialCards.length - visibleCards) {
+      currentIndex++;
+    } else {
+      currentIndex = 0; // Loop back to first card
+    }
+    updateSlider();
+  });
+
+  // Previous Slide
+  prevArrow.addEventListener('click', () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+    } else {
+      currentIndex = testimonialCards.length - visibleCards; // Loop to the last card
+    }
+    updateSlider();
+  });
+
+  // Auto Slide (every 3 seconds)
+  setInterval(() => {
+    if (currentIndex < testimonialCards.length - visibleCards) {
+      currentIndex++;
+    } else {
+      currentIndex = 0; // Loop back to first card
+    }
+    updateSlider();
+  }, 3000); // 3 seconds auto slide
+
+  updateSlider();
+});
+</script>
+
+{% schema %}
+{
+  "name": "Testimonial Slider",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "testimonial_image",
+          "label": "Testimonial Image"
+        },
+        {
+          "type": "textarea",
+          "id": "testimonial_content",
+          "label": "Testimonial Content"
+        },
+        {
+          "type": "text",
+          "id": "testimonial_author",
+          "label": "Author Name"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonial Slider",
+      "category": "Custom",
+      "blocks": [
+        {
+          "type": "testimonial",
+          "settings": {
+            "testimonial_image": "",
+            "testimonial_content": "This product is amazing!",
+            "testimonial_author": "John Doe"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "testimonial_image": "",
+            "testimonial_content": "I highly recommend it to everyone.",
+            "testimonial_author": "Jane Smith"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
