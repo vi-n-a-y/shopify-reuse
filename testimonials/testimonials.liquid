@@ -167,6 +167,7 @@ console.log(offset);
   // Previous Slide
   prevArrow.addEventListener('click', () => {
     if (currentIndex > 0) {
+console.log(currentIndex);
       currentIndex--;
     } else {
       currentIndex = testimonialCards.length - visibleCards; // Loop to the last card
